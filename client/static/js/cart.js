@@ -2,6 +2,7 @@ const modalContainer = document.getElementById("modal-container");
 const modalOverlay = document.getElementById("modal-overlay");
 
 const cartBtn = document.getElementById("cart-btn");
+const cartCounter = document.getElementById("cart-counter");
 
 const displayCart = () => {
     
@@ -31,6 +32,8 @@ const displayCart = () => {
     modalContainer.append(modalHeader);
 
     // modalBody
+    if (cart.length > 0){
+
     cart.forEach((product) => {
         const modalBody = document.createElement("div");
         modalBody.className = "modal-body";
@@ -57,23 +60,56 @@ const displayCart = () => {
                 product.quanty--;
                 displayCart();
             }
-        })
+            displayCartCounter(); 
+        });
 
-        const incrase = modalBody.querySelector(".quantity-btn-increse");
+        const increse = modalBody.querySelector(".quantity-btn-increse");
         increse.addEventListener("click", () => {
             product.quanty++;
             displayCart();
-        })
+            displayCartCounter();
+        });
+
+        //delete
+        const deleteProduct = modalBody.querySelector(".delete-product");
+        deleteProduct.addEventListener("click", () =>{
+            deleteCartProduct(product.id);
+        });
     });
 
     //modalFooter
+    const total = cart.reduce((acc, el) => acc + el.price * el.quanty, 0)
 
     const modalFooter = document.createElement("div");
     modalFooter.className = "modal-footer"
     modalFooter.innerHTML =`
-        <div class="total-price">Total :)</div>
+        <div class="total-price">${total}</div>
     `;
     modalContainer.append(modalFooter);
+}else{
+    const modalText = document.createElement("h2")
+    modalText.className = "modal-body";
+    modalText.innerText = "Your cart is empty"
+    modalContainer.append(modalText);
+}
 };
 
 cartBtn.addEventListener("click", displayCart);
+
+//funcDelete
+const deleteCartProduct = (id)=> {
+     const foundId = cart.findIndex((element) => element.id === id);
+     cart.splice(foundId, 1);
+     displayCart();
+     displayCartCounter();
+};
+
+const displayCartCounter = () => {
+    const cartLength = cart.reduce ((acc, el) => acc + el.quanty, 0);
+    if(cartLength > 0){
+        cartCounter.style.display = "block";
+        cartCounter.innerText = cartLength;
+    }else{
+        cartCounter.style.display = "none";
+    }
+};
